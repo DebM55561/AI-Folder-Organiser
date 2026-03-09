@@ -1,8 +1,12 @@
 import tkinter as tk
+# from logging import Manager
 from tkinter import filedialog, messagebox
-from filemanager import Filemanager
-from PreProc import PreProc
-from model import ModelHandler  # Updated class name
+
+import joblib
+
+from FolderManager import Filemanager
+from PreProcessing import PreProc
+from Model import ModelHandler  # Updated class name
 
 
 class FolderOrganizerGUI:
@@ -60,12 +64,17 @@ class FolderOrganizerGUI:
 
             self.status_label.config(text="Preprocessing text...")
             self.root.update()
-            pp = PreProc()
+            pp = PreProc(self.source_path)
             clean_data = pp.preprocessing(content_summaries)
+            print(clean_data)
 
             self.status_label.config(text="Clustering files...")
             self.root.update()
             ai = ModelHandler(dst)
+            if ai.pca_path.exists() and ai.kmeans_path.exists():
+                ai.pca_obj = joblib.load(str(ai.pca_path))
+                ai.kmeans_obj = joblib.load(str(ai.kmeans_path))
+                print("model loaded")
             ai.data = clean_data
             clusters = ai.filemodel()
             ai.save_model()
@@ -76,7 +85,7 @@ class FolderOrganizerGUI:
             self.status_label.config(text="Success!")
             messagebox.showinfo("Success", f"Organized {len(raw_filenames)} files.")
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            print(e)
 
 
 if __name__ == "__main__":
