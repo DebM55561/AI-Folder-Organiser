@@ -1,8 +1,13 @@
 import shutil
 from pathlib import Path
+import docx2txt
+
+from PIL import Image
+
 import fitz  # PyMuPDF
+from nltk.corpus.reader import documents
 
-
+print(fitz.__doc__)
 class Filemanager:
     def __init__(self, path, destination):
         self.path = Path(path)
@@ -51,18 +56,23 @@ class Filemanager:
             content = ""
 
             try:
+                if ext in [".jpeg", ".jpg", ".png"]:
+                    content = filename
+
                 if ext == ".txt":
                     # errors='ignore' prevents crashes on non-UTF-8 characters
-                    content = file_path.read_text(errors='ignore')[:500]
+                    content = f"{filename}+{filename}+{filename}"+file_path.read_text(errors='ignore')[:500]
 
                 elif ext == ".pdf":
                     with fitz.open(file_path) as doc:
                         if doc.page_count > 0:
                             # Extract text from the first page using PyMuPDF
-                            content = doc[0].get_text()[:500]
-
+                            content = f"{filename}+{filename}+{filename}"+doc[0].get_text()[:500]
+                elif ext == ".docx":
+                    txt = docx2txt.process(file_path)
+                    content = f"{filename}+{filename}+{filename}" + txt[:500]
                 # Check if file was empty or unsupported
-                if not content or content.strip() == "":
+                if not content:
                     content = f"empty or binary file: {filename}"
 
                 self.filesum.append(content)
