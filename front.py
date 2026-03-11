@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox
 import joblib
 
 from FolderManager import Filemanager
-from PreProcessing import PreProc
+from PreProcessing import PreProcessing
 from Model import ModelHandler  # Updated class name
 
 
@@ -64,9 +64,9 @@ class FolderOrganizerGUI:
 
             self.status_label.config(text="Preprocessing text...")
             self.root.update()
-            pp = PreProc(self.source_path)
-            clean_data = pp.preprocessing(content_summaries)
-            print(clean_data)
+            pp = PreProcessing(self.source_path.get())
+            clean_data = pp.processing_files(content_summaries)
+            # print(clean_data)
 
             self.status_label.config(text="Clustering files...")
             self.root.update()
